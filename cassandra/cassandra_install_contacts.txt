@@ -1,0 +1,79 @@
+-- Create table for testing (Must specify Keyspace)
+-- This is based on how we would use relational design
+-- In Cassandra look at patterns of how you access the data
+
+-- Create a Keyspace (like a namespace in Oracle or Postgresql)
+CREATE KEYSPACE contacts WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 }  AND durable_writes = true;
+
+CREATE TABLE contacts.Contacts_by_contactID
+(
+    contactID int primary key,
+    lastName text,
+    firstName text,
+    areacode text,
+    phone text,
+    email text
+);
+
+-- Copy data 
+COPY contacts.Contacts_by_contactID (contactID, firstName, lastName, areacode, phone, email) from '/tmp/contacts.csv' WITH DELIMITER = '~' AND HEADER = FALSE;
+
+-- Consider breaking data out into query patterns for names
+CREATE TABLE contacts.Contacts_by_names
+(
+    contactID int,
+    lastName text,
+    firstName text,
+    areacode text,
+    phone text,
+    email text,
+    PRIMARY KEY (lastname, firstname, contactID)
+);
+
+-- Copy data 
+COPY contacts.Contacts_by_names (contactID, firstName, lastName, areacode, phone, email) from '/tmp/contacts.csv' WITH DELIMITER = '~' AND HEADER = FALSE;
+
+-- Consider breaking data out into query patterns for phone
+CREATE TABLE contacts.Contacts_by_areacode
+(
+    contactID int,
+    lastName text,
+    firstName text,
+    areacode text,
+    phone text,
+    email text,
+    PRIMARY KEY (areacode, phone, contactID)
+);
+
+-- Copy data 
+COPY contacts.Contacts_by_areacode (contactID, firstName, lastName, areacode, phone, email) from '/tmp/contacts.csv' WITH DELIMITER = '~' AND HEADER = FALSE;
+
+-- Consider breaking data out into query patterns for phone
+CREATE TABLE contacts.Contacts_by_phone
+(
+    contactID int,
+    lastName text,
+    firstName text,
+    areacode text,
+    phone text,
+    email text,
+    PRIMARY KEY (phone, areacode, contactID)
+);
+
+-- Copy data 
+COPY contacts.Contacts_by_phone (contactID, firstName, lastName, areacode, phone, email) from '/tmp/contacts.csv' WITH DELIMITER = '~' AND HEADER = FALSE;
+
+-- Consider breaking data out into query patterns for email
+CREATE TABLE contacts.Contacts_by_email
+(
+    contactID int,
+    lastName text,
+    firstName text,
+    areacode text,
+    phone text,
+    email text,
+    PRIMARY KEY (email, contactID)
+);
+
+-- Copy data 
+COPY contacts.Contacts_by_email (contactID, firstName, lastName, areacode, phone, email) from '/tmp/contacts.csv' WITH DELIMITER = '~' AND HEADER = FALSE;
